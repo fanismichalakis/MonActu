@@ -4,4 +4,7 @@
     <string name="no_connection_dialog_title">Pas de connexion</string>
     <string name="ok_button">OK</string>
     <string name="cancel_button">Cancel</string>
+    <string name="thumbnail_of_article">thumbnail of article</string>
+    <string name="title">Title</string>
+    <string name="author">Author</string>
 </resources>
