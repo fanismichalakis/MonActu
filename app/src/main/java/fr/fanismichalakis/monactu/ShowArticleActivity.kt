@@ -1,0 +1,21 @@
+package fr.fanismichalakis.monactu
+
+import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.TextView
+
+class ShowArticleActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_show_article)
+
+        findViewById<TextView>(R.id.txtTitle).text = intent.getStringExtra("title")
+        findViewById<TextView>(R.id.txtAuthor).text = intent.getStringExtra("author")
+        findViewById<TextView>(R.id.txtDate).text = intent.getStringExtra("date")
+        findViewById<TextView>(R.id.txtSource).text = intent.getStringExtra("source")
+        findViewById<TextView>(R.id.txtDescription).text = intent.getStringExtra("description")
+        //findViewById<TextView>(R.id.articleThumbnail).text = intent.getStringExtra("imageUrl")
+        findViewById<TextView>(R.id.readArticle).text = intent.getStringExtra("articleUrl")
+    }
+}

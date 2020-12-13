@@ -10,28 +10,39 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class CustomAdapter (private val dataSet: ArrayList<ArticlesObject>) :
+class CustomAdapter (private val dataSet: ArrayList<ArticlesObject>, private val article_listener: OnArticleListener) :
     RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
-        class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        class ViewHolder(v: View, onArticleListener: OnArticleListener) : RecyclerView.ViewHolder(v) {
         val txtTitle: TextView
         val txtAuthor: TextView
         val txtDate: TextView
 
         init {
-            v.setOnClickListener { Log.d("RecycleView","Element $adapterPosition clicked") }
+            v.setOnClickListener {
+                onArticleListener.onArticleClick(adapterPosition)
+            }
             txtTitle = v.findViewById(R.id.txtTitle)
             txtAuthor = v.findViewById(R.id.txtAuthor)
             txtDate = v.findViewById(R.id.txtDate)
         }
     }
 
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
+    interface OnArticleListener{
+        fun onArticleClick(position: Int)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+        return ViewHolder(view.inflate(R.layout.list_item_article, parent, false), article_listener)
+    }
+
+    /*override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         val v = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.list_item_article, viewGroup, false)
 
         return ViewHolder(v)
-    }
+    }*/
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         Log.d(TAG, "Element $position set")

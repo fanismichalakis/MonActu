@@ -1,10 +1,12 @@
 package fr.fanismichalakis.monactu
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -24,12 +26,13 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
 
     lateinit var viewManager: LinearLayoutManager
     lateinit var viewAdapter: CustomAdapter
     lateinit var recyclerView: RecyclerView
     lateinit var dataset: ArrayList<ArticlesObject>
+    lateinit var datasetFull: ArrayList<ArticlesFullDetailObject>
 
     var sources: JSONArray = JSONArray()
     var BASE_URL: String = "https://newsapi.org/v2"
@@ -110,6 +113,22 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    override fun onArticleClick(position: Int) {
+        Log.d("onArticleClick", "datasetFull: $datasetFull")
+        val article = datasetFull[position]
+        Log.d("onArticleClick", "selected article: $article")
+        val articleIntent = Intent(this, ShowArticleActivity::class.java)
+        articleIntent.putExtra("title", article.title)
+        articleIntent.putExtra("author", article.author)
+        articleIntent.putExtra("date", article.date)
+        articleIntent.putExtra("source", article.source)
+        articleIntent.putExtra("description", article.description)
+        articleIntent.putExtra("imageUrl", article.imageUrl)
+        articleIntent.putExtra("articleUrl", article.articleUrl)
+        startActivity(articleIntent)
+    }
+
+
     private fun msgShow(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
     }
@@ -160,6 +179,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getArticles(source: String) {
         dataset = ArrayList<ArticlesObject>()
+        datasetFull = ArrayList<ArticlesFullDetailObject>()
         // Instantiate the RequestQueue.
         val queue = Volley.newRequestQueue(this)
         val url: String = "$BASE_URL/everything?apiKey=$API_KEY&language=$LANG&sources=$source"
@@ -174,21 +194,34 @@ class MainActivity : AppCompatActivity() {
             var strArticleTitle: String = ""
             var strArticleAuthor: String = ""
             var strArticleDate: String = ""
+            var strArticleSource: String = ""
+            var strArticleDescription: String = ""
+            var strArticleImageUrl: String = ""
+            var strArticleUrl: String = ""
             var article = ArticlesObject(strArticleTitle,strArticleTitle, strArticleDate)
+            var articleFull = ArticlesFullDetailObject()
             for (i in 0 until jsonArray.length()) {
                 val jsonInner: JSONObject = jsonArray.getJSONObject(i)
                 strArticleTitle = jsonInner.get("title").toString()
-                Log.d("getArticles", "title: $strArticleTitle")
                 strArticleAuthor = jsonInner.get("author").toString()
-                Log.d("getArticles", "author: $strArticleAuthor")
                 strArticleDate = jsonInner.get("publishedAt").toString()
-                Log.d("getArticles", "date: $strArticleDate")
                 article = ArticlesObject(strArticleTitle, strArticleAuthor, strArticleDate)
-                Log.d("article", "next article: ${article.toString()}")
                 dataset.add(article)
                 Log.d("dataset", "updated dataset: $dataset")
+                val jsonInnerSource: JSONObject = jsonInner.getJSONObject("source")
+                strArticleSource = jsonInnerSource.get("name").toString()
+                Log.d("full article", "source: $strArticleSource")
+                strArticleDescription = jsonInner.get("description").toString()
+                strArticleImageUrl = jsonInner.get("urlToImage").toString()
+                strArticleUrl = jsonInner.get("url").toString()
+                Log.d("full article", strArticleUrl)
+                articleFull = ArticlesFullDetailObject(strArticleTitle, strArticleAuthor, strArticleDate, strArticleSource, strArticleDescription, strArticleImageUrl, strArticleUrl)
+                datasetFull.add(articleFull)
+                Log.d("datasetFull", "updated datasetFull: $datasetFull")
+
             }
             Log.d("dataset", "dataset après boucle for: $dataset")
+            Log.d("datasetFull", "datasetFull après boucle for: $datasetFull")
             triggerRecyclerView()
         },
         Response.ErrorListener { error ->
@@ -206,9 +239,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    fun showArticle(v: View) {
+        msgShow("Article clicked!")
+        val monIntent = Intent(this, ShowArticleActivity::class.java)
+        startActivity(monIntent)
+    }
+
     private fun triggerRecyclerView() {
         viewManager = LinearLayoutManager(this)
-        viewAdapter = CustomAdapter(dataset)
+        viewAdapter = CustomAdapter(dataset, this)
 
         recyclerView = findViewById<RecyclerView>(R.id.recyclerViewArticles).apply {
             setHasFixedSize(true)

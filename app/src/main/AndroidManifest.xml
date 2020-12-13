@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MonActu">
-        <activity android:name=".ArticlesObject"></activity>
+        <activity android:name=".ShowArticleActivity"></activity>
+        <activity android:name=".ArticlesObject" />
         <activity android:name=".CustomAdapter" />
         <activity android:name=".MainActivity">
             <intent-filter>

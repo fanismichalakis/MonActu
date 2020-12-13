@@ -14,4 +14,7 @@
     <string name="source4">Les Echos</string>
     <string name="source5">Libération</string>
     <string name="date">Date</string>
+    <string name="source">Source</string>
+    <string name="description">Description</string>
+    <string name="read_article">Lire l\'article</string>
 </resources>
