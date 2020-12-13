@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var dataset: ArrayList<ArticlesObject>
 
     var sources: JSONArray = JSONArray()
+    var BASE_URL: String = "https://newsapi.org/v2"
     var SOURCE: String = "google-news-fr"
     var API_KEY: String = "d59958a4990048c896539cb17af6a6b7"
     var LANG: String = "fr"
@@ -109,35 +110,6 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    // actions on click menu items
-    /*override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.action_source1 -> {
-            msgShow("Source 1")
-            true
-        }
-        R.id.action_source2 -> {
-            msgShow("Source 2")
-            true
-        }
-        R.id.action_source3 -> {
-            msgShow("Source 3")
-            true
-        }
-        R.id.action_source4 -> {
-            msgShow("Source 4")
-            true
-        }
-        R.id.action_source5 -> {
-            msgShow("Source 5")
-            true
-        }
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }*/
-
     private fun msgShow(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
     }
@@ -145,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     private fun getSources() {
 
         val queue = Volley.newRequestQueue(this)
-        val url = "https://newsapi.org/v2/sources?apiKey=$API_KEY&language=$LANG"
+        val url = "$BASE_URL/sources?apiKey=$API_KEY&language=$LANG"
 
         // Request a string response from the provided URL.
         val stringRequest = object: JsonObjectRequest(
@@ -172,9 +144,9 @@ class MainActivity : AppCompatActivity() {
     private fun initMockDataset() {
         dataset = ArrayList<ArticlesObject>()
 
-        var article = ArticlesObject("A la Une", "Etienne Klein")
+        var article = ArticlesObject("A la Une", "Etienne Klein", "2020-12-09T05:00:00Z")
         dataset.add(article)
-        article = ArticlesObject("A la deux", "Max Weber")
+        article = ArticlesObject("A la deux", "Max Weber", "2020-12-09T05:00:00Z")
         dataset.add(article)
     }
 
@@ -190,7 +162,7 @@ class MainActivity : AppCompatActivity() {
         dataset = ArrayList<ArticlesObject>()
         // Instantiate the RequestQueue.
         val queue = Volley.newRequestQueue(this)
-        val url: String = "https://newsapi.org/v2/everything?apiKey=$API_KEY&language=$LANG&sources=$source"
+        val url: String = "$BASE_URL/everything?apiKey=$API_KEY&language=$LANG&sources=$source"
 
         val req = object : JsonObjectRequest(url, null,
         Response.Listener{ response ->
@@ -201,14 +173,17 @@ class MainActivity : AppCompatActivity() {
             val jsonArray: JSONArray = jsonObj.getJSONArray("articles")
             var strArticleTitle: String = ""
             var strArticleAuthor: String = ""
-            var article = ArticlesObject(strArticleTitle,strArticleTitle)
+            var strArticleDate: String = ""
+            var article = ArticlesObject(strArticleTitle,strArticleTitle, strArticleDate)
             for (i in 0 until jsonArray.length()) {
                 val jsonInner: JSONObject = jsonArray.getJSONObject(i)
                 strArticleTitle = jsonInner.get("title").toString()
                 Log.d("getArticles", "title: $strArticleTitle")
                 strArticleAuthor = jsonInner.get("author").toString()
-                Log.d("getArticles", "author; $strArticleAuthor")
-                article = ArticlesObject(strArticleTitle, strArticleAuthor)
+                Log.d("getArticles", "author: $strArticleAuthor")
+                strArticleDate = jsonInner.get("publishedAt").toString()
+                Log.d("getArticles", "date: $strArticleDate")
+                article = ArticlesObject(strArticleTitle, strArticleAuthor, strArticleDate)
                 Log.d("article", "next article: ${article.toString()}")
                 dataset.add(article)
                 Log.d("dataset", "updated dataset: $dataset")

@@ -16,11 +16,13 @@ class CustomAdapter (private val dataSet: ArrayList<ArticlesObject>) :
         class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val txtTitle: TextView
         val txtAuthor: TextView
+        val txtDate: TextView
 
         init {
             v.setOnClickListener { Log.d("RecycleView","Element $adapterPosition clicked") }
             txtTitle = v.findViewById(R.id.txtTitle)
             txtAuthor = v.findViewById(R.id.txtAuthor)
+            txtDate = v.findViewById(R.id.txtDate)
         }
     }
 
@@ -36,6 +38,7 @@ class CustomAdapter (private val dataSet: ArrayList<ArticlesObject>) :
 
         viewHolder.txtAuthor.text = dataSet[position].author
         viewHolder.txtTitle.text  = dataSet[position].title
+        viewHolder.txtDate.text = dataSet[position].date
     }
 
     override fun getItemCount() = dataSet.size
