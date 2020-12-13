@@ -3,7 +3,10 @@ package fr.fanismichalakis.monactu
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +31,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var recyclerView: RecyclerView
     lateinit var dataset: ArrayList<ArticlesObject>
 
+    var sources: JSONArray = JSONArray()
+
 
 
 
@@ -36,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        getSources()
+        Log.d("MainActivity", "sources: $sources")
 
         //initDataset()
         getArticles()
@@ -68,7 +76,57 @@ class MainActivity : AppCompatActivity() {
                 }
         val dialog: AlertDialog? = builder?.create()
 
+    }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu, menu)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        Log.d("onPrepareOptionsMenu", "sources: ${sources.toString()}")
+        super.onPrepareOptionsMenu(menu)
+        for (index in 0 until sources.length()) {
+            menu?.add(0, index, index, sources.getJSONObject(index).getString("name"))
+        }
+        return true
+    }
+
+    // actions on click menu items
+    /*override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_source1 -> {
+            msgShow("Source 1")
+            true
+        }
+        R.id.action_source2 -> {
+            msgShow("Source 2")
+            true
+        }
+        R.id.action_source3 -> {
+            msgShow("Source 3")
+            true
+        }
+        R.id.action_source4 -> {
+            msgShow("Source 4")
+            true
+        }
+        R.id.action_source5 -> {
+            msgShow("Source 5")
+            true
+        }
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun msgShow(msg: String) {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+    }*/
+
+    private fun getSources() {
         val apiKey = "d59958a4990048c896539cb17af6a6b7"
         val textViewSources = findViewById<TextView>(R.id.textViewSources)
 
@@ -79,12 +137,11 @@ class MainActivity : AppCompatActivity() {
         val stringRequest = object: JsonObjectRequest(
                 Request.Method.GET, url, null,
                 { response ->
-                    Log.d("TAG", response.toString())
-                    textViewSources.text = response.toString()
+                    sources = response.getJSONArray("sources")
                 },
                 { error ->
                     Log.d("TAG", "Something went wrong: $error")
-                    dialog?.show()
+                    //dialog?.show()
                 })
         {
             override fun getHeaders(): MutableMap<String, String> {
@@ -96,6 +153,7 @@ class MainActivity : AppCompatActivity() {
 
         queue.add(stringRequest)
     }
+
 
     private fun initMockDataset() {
         dataset = ArrayList<ArticlesObject>()
