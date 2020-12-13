@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
     var sources: JSONArray = JSONArray()
     var BASE_URL: String = "https://newsapi.org/v2"
     var SOURCE: String = "google-news-fr"
-    var API_KEY: String = "d59958a4990048c896539cb17af6a6b7"
+    var API_KEY: String = "4dccbee503d7462487eeba71e3d32f2b"
     var LANG: String = "fr"
     var CURRENT_PAGE: Int = 1
 
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         }*/
 
 
-        val builder: AlertDialog.Builder? = MainActivity@ this?.let {
+        /*val builder: AlertDialog.Builder? = MainActivity@ this?.let {
             AlertDialog.Builder(it)
         }
         builder?.setMessage(R.string.no_connection_message)
@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
                     //User cancelled the dialog
                     }
                 }
-        val dialog: AlertDialog? = builder?.create()
+        val dialog: AlertDialog? = builder?.create()*/
 
     }
 
@@ -148,7 +148,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
             },
             { error ->
                 Log.d("TAG", "Something went wrong: $error")
-                //dialog?.show()
+                sendAlert()?.show()
             })
         {
             override fun getHeaders(): MutableMap<String, String> {
@@ -236,6 +236,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
             },
             Response.ErrorListener { error ->
                 Log.e("getArticles", "Something went wrong $error")
+                sendAlert()?.show()
             })
         {
             override fun getHeaders(): MutableMap<String, String> {
@@ -253,6 +254,27 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         msgShow("Article clicked!")
         val monIntent = Intent(this, ShowArticleActivity::class.java)
         startActivity(monIntent)
+    }
+
+    private fun sendAlert(): AlertDialog? {
+        val builder: AlertDialog.Builder? = MainActivity@ this?.let {
+            AlertDialog.Builder(it)
+        }
+        builder?.setMessage(R.string.no_connection_message)
+                ?.setTitle(R.string.no_connection_dialog_title)
+                ?.apply {
+                    setPositiveButton(
+                            R.string.ok_button
+                    ) { dialog, id ->
+                        //User clicked OK button
+                    }
+                    setNegativeButton(
+                            R.string.cancel_button
+                    ) { dialog, id ->
+                        //User cancelled the dialog
+                    }
+                }
+        return builder?.create()
     }
 
     private fun triggerRecyclerView() {
