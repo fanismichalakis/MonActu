@@ -32,6 +32,9 @@ class MainActivity : AppCompatActivity() {
     lateinit var dataset: ArrayList<ArticlesObject>
 
     var sources: JSONArray = JSONArray()
+    var SOURCE: String = "google-news-fr"
+    var API_KEY: String = "d59958a4990048c896539cb17af6a6b7"
+    var LANG: String = "fr"
 
 
 
@@ -46,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("MainActivity", "sources: $sources")
 
         //initDataset()
-        getArticles()
+        getArticles(SOURCE)
         //initMockDataset()
 
         /*viewManager = LinearLayoutManager(this)
@@ -87,9 +90,22 @@ class MainActivity : AppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         Log.d("onPrepareOptionsMenu", "sources: ${sources.toString()}")
         super.onPrepareOptionsMenu(menu)
+        if (sources.length() > 0) {
+            menu?.clear()
+        }
         for (index in 0 until sources.length()) {
             menu?.add(0, index, index, sources.getJSONObject(index).getString("name"))
         }
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val sourceId = sources.getJSONObject(item.itemId).getString("id")
+        SOURCE = sourceId
+        getArticles(SOURCE)
+        msgShow("Source switched to ${item.title}")
+
+
         return true
     }
 
@@ -120,18 +136,16 @@ class MainActivity : AppCompatActivity() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
-    }
+    }*/
 
     private fun msgShow(msg: String) {
         Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
-    }*/
+    }
 
     private fun getSources() {
-        val apiKey = "d59958a4990048c896539cb17af6a6b7"
-        val textViewSources = findViewById<TextView>(R.id.textViewSources)
 
         val queue = Volley.newRequestQueue(this)
-        val url = "https://newsapi.org/v2/sources?apiKey=$apiKey&language=fr"
+        val url = "https://newsapi.org/v2/sources?apiKey=$API_KEY&language=$LANG"
 
         // Request a string response from the provided URL.
         val stringRequest = object: JsonObjectRequest(
@@ -172,11 +186,11 @@ class MainActivity : AppCompatActivity() {
         Log.d("initDataset", "dataset = ${dataset.toString()}")
     }*/
 
-    private fun getArticles() {
+    private fun getArticles(source: String) {
         dataset = ArrayList<ArticlesObject>()
         // Instantiate the RequestQueue.
         val queue = Volley.newRequestQueue(this)
-        val url: String = "https://newsapi.org/v2/everything?apiKey=d59958a4990048c896539cb17af6a6b7&language=fr&sources=google-news-fr"
+        val url: String = "https://newsapi.org/v2/everything?apiKey=$API_KEY&language=$LANG&sources=$source"
 
         val req = object : JsonObjectRequest(url, null,
         Response.Listener{ response ->
