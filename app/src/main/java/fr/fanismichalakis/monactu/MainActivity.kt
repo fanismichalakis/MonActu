@@ -51,40 +51,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         Log.d("MainActivity", "sources: $sources")
 
 
-        //initDataset()
         getArticles(SOURCE)
-        //initMockDataset()
-
-
-
-        /*viewManager = LinearLayoutManager(this)
-        viewAdapter = CustomAdapter(dataset)
-
-        recyclerView = findViewById<RecyclerView>(R.id.recyclerViewArticles).apply {
-            setHasFixedSize(true)
-            layoutManager = viewManager
-            adapter = viewAdapter
-        }*/
-
-
-        /*val builder: AlertDialog.Builder? = MainActivity@ this?.let {
-            AlertDialog.Builder(it)
-        }
-        builder?.setMessage(R.string.no_connection_message)
-                ?.setTitle(R.string.no_connection_dialog_title)
-                ?.apply {
-                    setPositiveButton(
-                        R.string.ok_button
-                    ) { dialog, id ->
-                    //User clicked OK button
-                    }
-                    setNegativeButton(
-                        R.string.cancel_button
-                    ) { dialog, id ->
-                    //User cancelled the dialog
-                    }
-                }
-        val dialog: AlertDialog? = builder?.create()*/
 
     }
 
@@ -142,7 +109,6 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         val queue = Volley.newRequestQueue(this)
         val url = "$BASE_URL/sources?apiKey=$API_KEY&language=$LANG"
 
-        // Request a string response from the provided URL.
         val stringRequest = object: JsonObjectRequest(
             Request.Method.GET, url, null,
             { response ->
@@ -162,24 +128,6 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
 
         queue.add(stringRequest)
     }
-
-
-    private fun initMockDataset() {
-        dataset = ArrayList<ArticlesObject>()
-
-        var article = ArticlesObject("A la Une", "Etienne Klein", "2020-12-09T05:00:00Z")
-        dataset.add(article)
-        article = ArticlesObject("A la deux", "Max Weber", "2020-12-09T05:00:00Z")
-        dataset.add(article)
-    }
-
-    /*private fun initDataset() {
-        dataset = ArrayList<ArticlesObject>()
-
-        // add articles to dataset
-        dataset = getArticles(dataset)
-        Log.d("initDataset", "dataset = ${dataset.toString()}")
-    }*/
 
     private fun getArticles(source: String) {
         dataset = ArrayList<ArticlesObject>()
@@ -254,12 +202,6 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
 
     }
 
-    fun showArticle(v: View) {
-        msgShow("Article clicked!")
-        val monIntent = Intent(this, ShowArticleActivity::class.java)
-        startActivity(monIntent)
-    }
-
     private fun sendAlert(): AlertDialog? {
         val builder: AlertDialog.Builder? = MainActivity@ this?.let {
             AlertDialog.Builder(it)
@@ -279,14 +221,6 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
                     }
                 }
         return builder?.create()
-    }
-
-    private fun changeProgressBarVisibility() {
-        val progressBar: ProgressBar = findViewById<ProgressBar>(R.id.progressBar)
-        when(progressBar.visibility) {
-            View.VISIBLE -> progressBar.visibility = View.INVISIBLE
-            View.INVISIBLE -> progressBar.visibility = View.VISIBLE
-        }
     }
 
     private fun hideProgressBar() {
