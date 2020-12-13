@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -17,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import org.json.JSONArray
 import org.json.JSONObject
@@ -39,6 +37,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
     var SOURCE: String = "google-news-fr"
     var API_KEY: String = "d59958a4990048c896539cb17af6a6b7"
     var LANG: String = "fr"
+    var CURRENT_PAGE: Int = 1
 
 
 
@@ -72,11 +71,13 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         builder?.setMessage(R.string.no_connection_message)
                 ?.setTitle(R.string.no_connection_dialog_title)
                 ?.apply {
-                    setPositiveButton(R.string.ok_button
+                    setPositiveButton(
+                        R.string.ok_button
                     ) { dialog, id ->
                     //User clicked OK button
                     }
-                    setNegativeButton(R.string.cancel_button
+                    setNegativeButton(
+                        R.string.cancel_button
                     ) { dialog, id ->
                     //User cancelled the dialog
                     }
@@ -106,6 +107,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val sourceId = sources.getJSONObject(item.itemId).getString("id")
         SOURCE = sourceId
+        CURRENT_PAGE = 1
         getArticles(SOURCE)
         msgShow("Source switched to ${item.title}")
 
@@ -140,14 +142,14 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
 
         // Request a string response from the provided URL.
         val stringRequest = object: JsonObjectRequest(
-                Request.Method.GET, url, null,
-                { response ->
-                    sources = response.getJSONArray("sources")
-                },
-                { error ->
-                    Log.d("TAG", "Something went wrong: $error")
-                    //dialog?.show()
-                })
+            Request.Method.GET, url, null,
+            { response ->
+                sources = response.getJSONArray("sources")
+            },
+            { error ->
+                Log.d("TAG", "Something went wrong: $error")
+                //dialog?.show()
+            })
         {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
@@ -182,51 +184,59 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         datasetFull = ArrayList<ArticlesFullDetailObject>()
         // Instantiate the RequestQueue.
         val queue = Volley.newRequestQueue(this)
-        val url: String = "$BASE_URL/everything?apiKey=$API_KEY&language=$LANG&sources=$source"
+        val url: String = "$BASE_URL/everything?apiKey=$API_KEY&language=$LANG&sources=$source&page=$CURRENT_PAGE"
 
         val req = object : JsonObjectRequest(url, null,
-        Response.Listener{ response ->
-            val strResp = response.toString()
-            val jsonObj: JSONObject = JSONObject(strResp)
-            Log.d("getArticles", "JSON of articles : $jsonObj")
-            Log.d("getArticles", "JSON.toString() of articles : ${jsonObj.toString()}")
-            val jsonArray: JSONArray = jsonObj.getJSONArray("articles")
-            var strArticleTitle: String = ""
-            var strArticleAuthor: String = ""
-            var strArticleDate: String = ""
-            var strArticleSource: String = ""
-            var strArticleDescription: String = ""
-            var strArticleImageUrl: String = ""
-            var strArticleUrl: String = ""
-            var article = ArticlesObject(strArticleTitle,strArticleTitle, strArticleDate)
-            var articleFull = ArticlesFullDetailObject()
-            for (i in 0 until jsonArray.length()) {
-                val jsonInner: JSONObject = jsonArray.getJSONObject(i)
-                strArticleTitle = jsonInner.get("title").toString()
-                strArticleAuthor = jsonInner.get("author").toString()
-                strArticleDate = jsonInner.get("publishedAt").toString()
-                article = ArticlesObject(strArticleTitle, strArticleAuthor, strArticleDate)
-                dataset.add(article)
-                Log.d("dataset", "updated dataset: $dataset")
-                val jsonInnerSource: JSONObject = jsonInner.getJSONObject("source")
-                strArticleSource = jsonInnerSource.get("name").toString()
-                Log.d("full article", "source: $strArticleSource")
-                strArticleDescription = jsonInner.get("description").toString()
-                strArticleImageUrl = jsonInner.get("urlToImage").toString()
-                strArticleUrl = jsonInner.get("url").toString()
-                Log.d("full article", strArticleUrl)
-                articleFull = ArticlesFullDetailObject(strArticleTitle, strArticleAuthor, strArticleDate, strArticleSource, strArticleDescription, strArticleImageUrl, strArticleUrl)
-                datasetFull.add(articleFull)
-                Log.d("datasetFull", "updated datasetFull: $datasetFull")
+            Response.Listener { response ->
+                val strResp = response.toString()
+                val jsonObj: JSONObject = JSONObject(strResp)
+                Log.d("getArticles", "JSON of articles : $jsonObj")
+                Log.d("getArticles", "JSON.toString() of articles : ${jsonObj.toString()}")
+                val jsonArray: JSONArray = jsonObj.getJSONArray("articles")
+                var strArticleTitle: String = ""
+                var strArticleAuthor: String = ""
+                var strArticleDate: String = ""
+                var strArticleSource: String = ""
+                var strArticleDescription: String = ""
+                var strArticleImageUrl: String = ""
+                var strArticleUrl: String = ""
+                var article = ArticlesObject(strArticleTitle, strArticleTitle, strArticleDate)
+                var articleFull = ArticlesFullDetailObject()
+                for (i in 0 until jsonArray.length()) {
+                    val jsonInner: JSONObject = jsonArray.getJSONObject(i)
+                    strArticleTitle = jsonInner.get("title").toString()
+                    strArticleAuthor = jsonInner.get("author").toString()
+                    strArticleDate = jsonInner.get("publishedAt").toString()
+                    article = ArticlesObject(strArticleTitle, strArticleAuthor, strArticleDate)
+                    dataset.add(article)
+                    Log.d("dataset", "updated dataset: $dataset")
+                    val jsonInnerSource: JSONObject = jsonInner.getJSONObject("source")
+                    strArticleSource = jsonInnerSource.get("name").toString()
+                    Log.d("full article", "source: $strArticleSource")
+                    strArticleDescription = jsonInner.get("description").toString()
+                    strArticleImageUrl = jsonInner.get("urlToImage").toString()
+                    strArticleUrl = jsonInner.get("url").toString()
+                    Log.d("full article", strArticleUrl)
+                    articleFull = ArticlesFullDetailObject(
+                        strArticleTitle,
+                        strArticleAuthor,
+                        strArticleDate,
+                        strArticleSource,
+                        strArticleDescription,
+                        strArticleImageUrl,
+                        strArticleUrl
+                    )
+                    datasetFull.add(articleFull)
+                    Log.d("datasetFull", "updated datasetFull: $datasetFull")
 
-            }
-            Log.d("dataset", "dataset après boucle for: $dataset")
-            Log.d("datasetFull", "datasetFull après boucle for: $datasetFull")
-            triggerRecyclerView()
-        },
-        Response.ErrorListener { error ->
-            Log.e("getArticles", "Something went wrong $error")
-        })
+                }
+                Log.d("dataset", "dataset après boucle for: $dataset")
+                Log.d("datasetFull", "datasetFull après boucle for: $datasetFull")
+                triggerRecyclerView()
+            },
+            Response.ErrorListener { error ->
+                Log.e("getArticles", "Something went wrong $error")
+            })
         {
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
@@ -254,5 +264,16 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
             layoutManager = viewManager
             adapter = viewAdapter
         }
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (!recyclerView.canScrollVertically(1)) {
+                    //msgShow("Reached bottom")
+                    CURRENT_PAGE++
+                    getArticles(SOURCE)
+                }
+            }
+        })
     }
 }
