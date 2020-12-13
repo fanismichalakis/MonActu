@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -41,8 +42,6 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
 
 
 
-
-
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,9 +50,12 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
         getSources()
         Log.d("MainActivity", "sources: $sources")
 
+
         //initDataset()
         getArticles(SOURCE)
         //initMockDataset()
+
+
 
         /*viewManager = LinearLayoutManager(this)
         viewAdapter = CustomAdapter(dataset)
@@ -188,6 +190,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
 
         val req = object : JsonObjectRequest(url, null,
             Response.Listener { response ->
+                showProgressBar()
                 val strResp = response.toString()
                 val jsonObj: JSONObject = JSONObject(strResp)
                 Log.d("getArticles", "JSON of articles : $jsonObj")
@@ -230,6 +233,7 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
                     Log.d("datasetFull", "updated datasetFull: $datasetFull")
 
                 }
+                hideProgressBar()
                 Log.d("dataset", "dataset après boucle for: $dataset")
                 Log.d("datasetFull", "datasetFull après boucle for: $datasetFull")
                 triggerRecyclerView()
@@ -275,6 +279,24 @@ class MainActivity : AppCompatActivity(), CustomAdapter.OnArticleListener {
                     }
                 }
         return builder?.create()
+    }
+
+    private fun changeProgressBarVisibility() {
+        val progressBar: ProgressBar = findViewById<ProgressBar>(R.id.progressBar)
+        when(progressBar.visibility) {
+            View.VISIBLE -> progressBar.visibility = View.INVISIBLE
+            View.INVISIBLE -> progressBar.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideProgressBar() {
+        val progressBar: ProgressBar = findViewById<ProgressBar>(R.id.progressBar)
+        progressBar.visibility = View.INVISIBLE
+    }
+
+    private fun showProgressBar() {
+        val progressBar: ProgressBar = findViewById<ProgressBar>(R.id.progressBar)
+        progressBar.visibility = View.VISIBLE
     }
 
     private fun triggerRecyclerView() {
